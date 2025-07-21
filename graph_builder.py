@@ -32,7 +32,6 @@ def build_graph():
     builder.add_edge("CastingAgent", "TitleAgent")
     builder.add_edge("TitleAgent", "CriticAgent")
 
-    # Conditional edge from CriticAgent
     builder.add_conditional_edges(
         "CriticAgent",
         lambda state: "FinalOutput" if state["verdict"] == "Consistent" else "PlotWriter"
