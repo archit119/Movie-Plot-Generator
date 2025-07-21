@@ -4,7 +4,7 @@ from langchain_openai import ChatOpenAI
 
 load_dotenv()  # 🔑 Loads from .env
 
-MODEL = "gpt-4"
+MODEL = "gpt-4o-mini"
 system_prompt = """
 You are a Hollywood screenwriter who specializes in high-concept genre movies. 
 You write punchy, dramatic stories that feel like blockbusters.
