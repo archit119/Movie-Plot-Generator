@@ -16,6 +16,8 @@ class MovieState(TypedDict):
     title: str
     verdict: str
     director_style: Optional[str]
+    additional_notes: Optional[str]
+    retries: int
 
 def build_graph():
     builder = StateGraph(MovieState)
@@ -33,8 +35,10 @@ def build_graph():
     builder.add_edge("TitleAgent", "CriticAgent")
 
     builder.add_conditional_edges(
-        "CriticAgent",
-        lambda state: "FinalOutput" if state["verdict"] == "Consistent" else "PlotWriter"
+    "CriticAgent",
+    lambda state: "FinalOutput"
+    if state["verdict"] == "Consistent" or state.get("retries", 0) >= 24
+    else "PlotWriter"
     )
 
     # Final output node
