@@ -21,56 +21,28 @@ def generate_with_feedback(genre, director_style, additional_notes):
 
 def generate_movie_pitch(genre, director_style, additional_notes):
     try:
-        # Build initial state for LangGraph
         initial_state = {
             "genre": genre,
-            "additional_notes": additional_notes
+            "additional_notes": additional_notes,
+            "retries": 0
         }
-
         if director_style.strip():
             initial_state["director_style"] = director_style.strip()
 
         result = graph.invoke(initial_state)
 
-        # Extract results
-        title = result.get("title", "N/A").strip()
-        plot = result.get("plot", "N/A").strip()
-        cast = result.get("cast", "N/A").strip()
-        verdict = result.get("verdict", "N/A").strip()
-
-        # Format movie pitch
         pitch_lines = [
-            f"🎬 **Title**: {title}",
-            f"🧠 **Plot**: {plot}",
-            f"🎭 **Cast**: {cast}",
-            f"🧪 **Verdict**: {verdict}"
+            f"🎬 **Title**: {result.get('title', 'N/A').strip()}",
+            f"🧠 **Plot**: {result.get('plot', 'N/A').strip()}",
+            f"🎭 **Cast**: {result.get('cast', 'N/A').strip()}",
+            f"🧪 **Verdict**: {result.get('verdict', 'N/A').strip()}"
         ]
-        pitch_text = "\n\n".join(pitch_lines)
 
-        # 🆕 Generate full script using GPT-4o-mini
-        client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-        script_prompt = (
-            f"Based on the following movie pitch, write a short screenplay:\n\n"
-            f"Title: {title}\nPlot: {plot}\nCast: {cast}\nDirector Style: {director_style}\n"
-            f"Additional Notes: {additional_notes}\n\n"
-            f"Format it as a screenplay using standard movie script formatting."
-        )
-
-        response = client.chat.completions.create(
-        model="gpt-4o",
-        messages=[
-            {"role": "user", "content": script_prompt}
-        ],
-        temperature=0.8
-        )
-
-        script_text = response.choices[0].message.content
-
-
-        return pitch_text, script_text
+        return "\n\n".join(pitch_lines), result.get("script", "").strip()
 
     except Exception as e:
         return f"❌ Error: {str(e)}", ""
+
 
 
 

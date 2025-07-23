@@ -4,6 +4,8 @@ from agents.plot_writer import plot_writer
 from agents.casting_agent import casting_agent
 from agents.title_agent import title_agent
 from agents.critic_agent import critic_agent
+from agents.script_planner import script_planner
+from agents.scene_writer import scene_writer
 from agents.director_style_agent import director_style_agent
 import matplotlib.pyplot as plt
 import networkx as nx
@@ -18,6 +20,8 @@ class MovieState(TypedDict):
     director_style: Optional[str]
     additional_notes: Optional[str]
     retries: int
+    script_outline: Optional[list[str]]
+    script: Optional[str]    
 
 def build_graph():
     builder = StateGraph(MovieState)
@@ -27,12 +31,17 @@ def build_graph():
     builder.add_node("TitleAgent", title_agent)
     builder.add_node("CriticAgent", critic_agent)
     builder.add_node("DirectorStyleAgent", director_style_agent)
+    builder.add_node("ScriptPlanner", script_planner)
+    builder.add_node("SceneWriter", scene_writer)
 
     builder.set_entry_point("PlotWriter")
     builder.add_edge("PlotWriter", "DirectorStyleAgent")
     builder.add_edge("DirectorStyleAgent", "CastingAgent")
     builder.add_edge("CastingAgent", "TitleAgent")
     builder.add_edge("TitleAgent", "CriticAgent")
+    builder.add_edge("CriticAgent", "ScriptPlanner")
+    builder.add_edge("ScriptPlanner", "SceneWriter")
+    builder.add_edge("SceneWriter", "FinalOutput")
 
     builder.add_conditional_edges(
     "CriticAgent",
